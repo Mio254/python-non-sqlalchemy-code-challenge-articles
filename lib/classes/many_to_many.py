@@ -11,6 +11,11 @@ class Article:
     def title(self):
         return self._title
 
+    @title.setter
+    def title(self, value):
+        
+        pass
+
 
 class Author:
     def __init__(self, name):
@@ -20,27 +25,33 @@ class Author:
     def name(self):
         return self._name
 
+    @name.setter
+    def name(self, value):
+       
+        pass
+
     def articles(self):
         return [article for article in Article.all if article.author == self]
 
     def magazines(self):
-        mags = [article.magazine for article in self.articles()]
-       
-        return list(set(mags))
+        return list({article.magazine for article in self.articles()})
 
     def add_article(self, magazine, title):
         return Article(self, magazine, title)
 
     def topic_areas(self):
-        return list(set([article.magazine.category for article in self.articles()]))
+        arts = self.articles()
+        if not arts:
+            return None
+        return list({article.magazine.category for article in arts})
 
 
 class Magazine:
     def __init__(self, name, category):
         self._name = None
         self._category = None
-        self.name = name        
-        self.category = category  
+        self.name = name
+        self.category = category
 
     @property
     def name(self):
@@ -64,16 +75,16 @@ class Magazine:
         return [article for article in Article.all if article.magazine == self]
 
     def contributors(self):
-        authors = [article.author for article in self.articles()]
-        return list(set(authors))  
+        return list({article.author for article in self.articles()})
 
     def article_titles(self):
-        return [article.title for article in self.articles()]
+        titles = [article.title for article in self.articles()]
+        return titles if titles else None
 
     def contributing_authors(self):
-        result = []
+        authors = []
         for author in self.contributors():
-            authored_articles = [a for a in self.articles() if a.author == author]
-            if len(authored_articles) > 2:
-                result.append(author)
-        return result
+            count = len([a for a in self.articles() if a.author == author])
+            if count > 2:
+                authors.append(author)
+        return authors if authors else None
